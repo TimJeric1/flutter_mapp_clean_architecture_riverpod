@@ -1,24 +1,29 @@
 import 'package:data_connection_checker_tv/data_connection_checker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mapp_clean_architecture/features/pokemon/presentation/providers/selected_pokemon_item_provider.dart';
+import 'package:flutter_mapp_clean_architecture/features/pokemon_image/presentation/providers/pokemon_image_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:math';
-import 'package:provider/provider.dart';
 
 import '../../../../../core/connection/network_info.dart';
 import '../../../../../core/constants/constants.dart';
 import '../providers/pokemon_provider.dart';
-import '../providers/selected_pokemon_item_provider.dart';
 import 'custom_elevated_button_widget.dart';
 
-class SearchPokemonWidget extends StatelessWidget {
+class SearchPokemonWidget extends ConsumerWidget {
   const SearchPokemonWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pokemonImageProvider =
+        ref.watch(pokemonImageNotifierProvider.notifier);
     ScaffoldMessengerState scaffoldMessengerState =
         ScaffoldMessenger.of(context);
-    SelectedPokemonItemProvider selectedPokemonItem =
-        Provider.of<SelectedPokemonItemProvider>(context);
+    final selectedPokemonItem =
+        ref.watch(selectedPokemonItemNotifierProvider.notifier);
+
+    final selectedPokemonItemNumber = ref.watch(selectedPokemonItemNotifierProvider);
     return Padding(
       padding: const EdgeInsets.only(
         left: 20.0,
@@ -73,7 +78,7 @@ class SearchPokemonWidget extends StatelessWidget {
                               useMagnifier: true,
                               itemExtent: 32.0,
                               scrollController: FixedExtentScrollController(
-                                initialItem: selectedPokemonItem.number,
+                                initialItem: selectedPokemonItemNumber,
                               ),
                               onSelectedItemChanged: (int selectedItem) {
                                 selectedPokemonItem.changeNumber(
@@ -98,7 +103,7 @@ class SearchPokemonWidget extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  '# ${selectedPokemonItem.number + 1}',
+                  '# ${selectedPokemonItemNumber + 1}',
                   style: const TextStyle(
                     fontSize: 22.0,
                   ),
@@ -111,10 +116,6 @@ class SearchPokemonWidget extends StatelessWidget {
             textColor: Colors.white,
             iconColor: Colors.white,
             callback: () async {
-              Provider.of<PokemonProvider>(context, listen: false)
-                  .eitherFailureOrPokemon(
-                value: (selectedPokemonItem.number + 1).toString(),
-              );
               if (await NetworkInfoImpl(DataConnectionChecker()).isConnected ==
                   false) {
                 scaffoldMessengerState.clearSnackBars();
@@ -125,7 +126,10 @@ class SearchPokemonWidget extends StatelessWidget {
                     showCloseIcon: true,
                   ),
                 );
+                return;
               }
+              ref.read(pokemonNotifierProvider.notifier).getPokemon(
+                  pokemonId: (selectedPokemonItemNumber + 1).toString());
             },
           ),
         ],

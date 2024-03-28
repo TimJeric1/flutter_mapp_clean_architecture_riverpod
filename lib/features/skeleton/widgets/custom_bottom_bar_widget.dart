@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'custom_bottom_bar_icon_widget.dart';
 import '../providers/selected_page_provider.dart';
 
-class CustomBottomBarWidget extends StatelessWidget {
+class CustomBottomBarWidget extends ConsumerWidget {
   const CustomBottomBarWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    int selectedPage = Provider.of<SelectedPageProvider>(context).selectedPage;
+  Widget build(BuildContext context, WidgetRef ref) {
+    int selectedPage = ref.watch(selectedPageNotiferProvider);
+
 
     return SafeArea(
       child: BottomAppBar(
@@ -38,8 +40,7 @@ class CustomBottomBarWidget extends StatelessWidget {
                   iconDataSelected: Icons.search_outlined,
                   iconDataUnselected: Icons.search_outlined,
                   callback: () {
-                    Provider.of<SelectedPageProvider>(context, listen: false)
-                        .changePage(0);
+                    ref.read(selectedPageNotiferProvider.notifier).changePage(0);
                   },
                   isSelected: selectedPage == 0,
                 ),
@@ -47,8 +48,7 @@ class CustomBottomBarWidget extends StatelessWidget {
                   iconDataSelected: Icons.menu,
                   iconDataUnselected: Icons.menu,
                   callback: () {
-                    Provider.of<SelectedPageProvider>(context, listen: false)
-                        .changePage(1);
+                    ref.read(selectedPageNotiferProvider.notifier).changePage(1);
                   },
                   isSelected: selectedPage == 1,
                 ),

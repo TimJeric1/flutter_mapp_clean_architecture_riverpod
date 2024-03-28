@@ -1,9 +1,23 @@
 import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../../core/errors/exceptions.dart';
 import '../models/pokemon_model.dart';
 
+
+part 'pokemon_local_data_source.g.dart';
+
+@riverpod
+Future<SharedPreferences> sharedPreferences(SharedPreferencesRef ref) async {
+  return await SharedPreferences.getInstance();
+}
+@riverpod
+Future<PokemonLocalDataSourceImpl> pokemonLocalDataSourceImpl(PokemonLocalDataSourceImplRef ref) async {
+  final sharedPreferences = await ref.read(sharedPreferencesProvider.future);
+  return PokemonLocalDataSourceImpl(sharedPreferences: sharedPreferences);
+}
 
 abstract class PokemonLocalDataSource {
   Future<void>? cachePokemon(PokemonModel? pokemonToCache);

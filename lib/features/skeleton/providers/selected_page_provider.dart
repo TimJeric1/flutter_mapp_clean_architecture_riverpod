@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class SelectedPageProvider extends ChangeNotifier {
-  int selectedPage;
 
-  SelectedPageProvider({
-    this.selectedPage = 0,
-  });
+part 'selected_page_provider.g.dart';
+
+
+
+@Riverpod(keepAlive: true)
+class SelectedPageNotifer extends _$SelectedPageNotifer {
+
+  @override
+  int build() => 0;
+
 
   void changePage(int newValue) {
-    selectedPage = newValue;
-    notifyListeners();
+    state = newValue;
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../pokemon/presentation/pages/data_page.dart';
 import '../pokemon/presentation/pages/pokemon_page.dart';
 import 'package:provider/provider.dart';
@@ -10,16 +11,16 @@ List<Widget> pages = const [
   DataPage(),
 ];
 
-class Skeleton extends StatelessWidget {
+class Skeleton extends ConsumerWidget {
   const Skeleton({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    int selectedPage = Provider.of<SelectedPageProvider>(context).selectedPage;
+  Widget build(BuildContext context, WidgetRef ref) {
+    int selectedPage = ref.watch(selectedPageNotiferProvider);
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: const Text('Poke-Mapp'),
+        title: const Text('Poke-Map'),
       ),
       body: pages[selectedPage],
       bottomNavigationBar: const CustomBottomBarWidget(),

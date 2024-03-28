@@ -9,7 +9,7 @@ class GetPokemon {
 
   GetPokemon(this.repository);
 
-  Future<Either<Failure, PokemonEntity>> call({required PokemonParams params}) async {
+  Future<PokemonEntity> call({required PokemonParams params}) async {
     return await repository.getPokemon(params: params);
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mapp_clean_architecture/features/pokemon_image/presentation/providers/pokemon_image_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'features/pokemon/presentation/providers/pokemon_provider.dart';
 import 'features/pokemon/presentation/providers/selected_pokemon_item_provider.dart';
@@ -6,29 +8,20 @@ import 'features/skeleton/providers/selected_page_provider.dart';
 import 'features/skeleton/skeleton.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => SelectedPageProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => PokemonProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => SelectedPokemonItemProvider(),
-        ),
-      ],
-      child: MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedPokemonItem = ref.read(selectedPokemonItemNotifierProvider);
+    ref.read(pokemonNotifierProvider.notifier).getPokemon(pokemonId: (selectedPokemonItem+1).toString());
+
+    return MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Poke Mapp',
+        title: 'Poke Map',
         theme: ThemeData(
             useMaterial3: true,
             primarySwatch: Colors.blue,
@@ -42,32 +35,9 @@ class MyApp extends StatelessWidget {
             iconTheme: const IconThemeData(
               color: Colors.black87,
             )),
-        home: const Home(),
-      ),
-    );
+        home: const Skeleton(),
+      );
+
   }
 }
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
-  @override
-  void initState() {
-    SelectedPokemonItemProvider selectedPokemonItem = Provider.of<SelectedPokemonItemProvider>(context, listen: false);
-
-    Provider.of<PokemonProvider>(context, listen: false).eitherFailureOrPokemon(
-      value: (selectedPokemonItem.number + 1).toString(),
-    );
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return const Skeleton();
-  }
-}

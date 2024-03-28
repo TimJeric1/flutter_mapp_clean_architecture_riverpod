@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../../../../core/errors/failure.dart';
-import 'pokemon_image_widget.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../pokemon_image/presentation/widgets/pokemon_image_widget.dart';
 import '../../business/entities/pokemon_entity.dart';
 import '../providers/pokemon_provider.dart';
 
-class PokemonWidget extends StatelessWidget {
+class PokemonWidget extends ConsumerWidget {
   const PokemonWidget({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    PokemonEntity? pokemon = Provider.of<PokemonProvider>(context).pokemon;
-    Failure? failure = Provider.of<PokemonProvider>(context).failure;
-    late Widget widget;
-    if (pokemon != null) {
-      widget = PokemonImageWidget(
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<PokemonEntity> pokemon = ref.watch(pokemonNotifierProvider);
+
+    return pokemon.when(
+      data: (pokemon) => PokemonImageWidget(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,26 +62,23 @@ class PokemonWidget extends StatelessWidget {
             ),
           ],
         ),
-      );
-    } else if (failure != null) {
-      widget = Expanded(
+      ),
+      error: (error, _) => Expanded(
         child: Center(
           child: Text(
-            failure.errorMessage,
+            error.toString(),
             style: const TextStyle(fontSize: 20),
           ),
         ),
-      );
-    } else {
-      widget = const Expanded(
+      ),
+      loading: () => const Expanded(
         child: Center(
           child: CircularProgressIndicator(
             backgroundColor: Colors.white,
             color: Colors.orangeAccent,
           ),
         ),
-      );
-    }
-    return widget;
+      ),
+    );
   }
 }
